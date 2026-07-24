@@ -18,16 +18,6 @@ logger = logging.getLogger(__name__)
 async def answer(bot, query):
     """Show search results for given inline query strictly in Bot PM only"""
 
-    # Strictly Bot PM Enforcement (Pyrofork compliant)
-    if query.chat_type not in (ChatType.PRIVATE, ChatType.SENDER):
-        await query.answer(
-            results=[],
-            cache_time=0,
-            switch_pm_text='⚠️ Work only in Bot PM',
-            switch_pm_parameter="help"
-        )
-        return
-        
     # Bug Fix 1: Zero Query Guard (Prevents database load)
     if not query.query.strip():
         await query.answer(
