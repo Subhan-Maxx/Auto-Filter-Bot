@@ -17,21 +17,23 @@ SESSION = environ.get('SESSION', 'techifybots')
 API_ID = int(environ.get('API_ID', ''))
 API_HASH = environ.get('API_HASH', '')
 BOT_TOKEN = environ.get('BOT_TOKEN', "")
-USE_CAPTION_FILTER = bool(environ.get('USE_CAPTION_FILTER', False))
+
+
+USE_CAPTION_FILTER = bool(environ.get('USE_CAPTION_FILTER', True))
 INDEX_CAPTION = bool(environ.get('INDEX_CAPTION', False))
 COVER = bool(environ.get('COVER', False))
 PICS = (environ.get('PICS', 'https://i.ibb.co/PzZNZHF6/IMG-20251116-113905-254.jpg https://i.ibb.co/8npWSZ5T/pic.jpg')).split()
 MELCOW_PHOTO = environ.get("MELCOW_PHOTO", "https://i.ibb.co/2769f1rF/photo-2025-09-03-14-48-34-7548400762112442372.jpg")
 ADMINS = [int(admin) if id_pattern.search(admin) else admin for admin in environ.get('ADMINS', '1255023013').split()]
-CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '').split()]
-LOG_CHANNEL = int(environ.get('LOG_CHANNEL', ''))
-BIN_CHANNEL = int(environ.get('BIN_CHANNEL', ''))
-PREMIUM_LOGS = int(environ.get('PREMIUM_LOGS', ''))
-DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in environ.get('DELETE_CHANNELS', '').split()]
+CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '-1003546567045').split()]
+LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1004450754842'))
+BIN_CHANNEL = int(environ.get('BIN_CHANNEL', '-1003808600189'))
+PREMIUM_LOGS = int(environ.get('PREMIUM_LOGS', '-1004427825363'))
+DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in environ.get('DELETE_CHANNELS', '-1004470413220').split()]
 AUTH_CHANNELS = [int(ch) for ch in environ.get("AUTH_CHANNELS", "").split() if ch and id_pattern.match(ch)]
 AUTH_REQ_CHANNELS = [int(ch) for ch in environ.get("AUTH_REQ_CHANNELS", "").split() if ch and id_pattern.match(ch)]
-REQST_CHANNEL = int(ch) if (ch := environ.get("REQST_CHANNEL", "")) and id_pattern.search(ch) else None
-SUPPORT_CHAT_ID = int(ch) if (ch := environ.get("SUPPORT_CHAT_ID", "")) and id_pattern.search(ch) else None
+REQST_CHANNEL = int(ch) if (ch := environ.get("REQST_CHANNEL", "-1004374598484")) and id_pattern.search(ch) else None
+SUPPORT_CHAT_ID = int(ch) if (ch := environ.get("SUPPORT_CHAT_ID", "-1004329912404")) and id_pattern.search(ch) else None
 
 OWNER = int(os.environ.get("OWNER", "1255023013"))
 CHANNEL_LINK = environ.get('CHANNEL_LINK', 'https://telegram.me/Techifybots')
@@ -43,8 +45,8 @@ COLLECTION_NAME = environ.get('COLLECTION_NAME', 'files')
 MULTIPLE_DB = is_enabled(os.environ.get('MULTIPLE_DB', "False"), False)
 DATABASE_URI2 = environ.get('DATABASE_URI2', "")
 
-UPDATE_NOTIFICATION = bool(environ.get('UPDATE_NOTIFICATION', False))
-UPDATE_CHANNEL = int(environ.get('UPDATE_CHANNEL', ''))
+UPDATE_NOTIFICATION = bool(environ.get('UPDATE_NOTIFICATION', True))
+UPDATE_CHANNEL = int(environ.get('UPDATE_CHANNEL', '-1004453646945'))
 IMAGE_FETCH = bool(environ.get('IMAGE_FETCH', True))
 LINK_PREVIEW = bool(environ.get('LINK_PREVIEW', False))
 ABOVE_PREVIEW = bool(environ.get('ABOVE_PREVIEW', False))
@@ -89,7 +91,7 @@ PM_SEARCH = bool(environ.get('PM_SEARCH', False))
 EMOJI_MODE = bool(environ.get('EMOJI_MODE', True))
 BUTTON_MODE = is_enabled((environ.get('BUTTON_MODE', "False")), False)
 STREAM_MODE = bool(environ.get('STREAM_MODE', True))
-PREMIUM_STREAM_MODE = bool(environ.get('PREMIUM_STREAM_MODE', False))
+PREMIUM_STREAM_MODE = bool(environ.get('PREMIUM_STREAM_MODE', True))
 MAINTENANCE = is_enabled(environ.get('MAINTENANCE', "False"), False)
 
 LANGUAGES = {"ᴛᴀᴍɪʟ":"tam","ᴛᴇʟᴜɢᴜ":"tel","ᴇɴɢʟɪsʜ":"eng","ʜɪɴᴅɪ":"hin","ᴊᴀᴘᴀɴᴇsᴇ":"jap"}
