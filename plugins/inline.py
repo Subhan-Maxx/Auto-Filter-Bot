@@ -16,8 +16,9 @@ logger = logging.getLogger(__name__)
 
 @Client.on_inline_query()
 async def answer(bot, query):
-    """Show search results for given inline query"""
+    """Show search results for given inline query strictly in Bot PM only"""
 
+    # Strictly Bot PM Enforcement (Pyrofork compliant)
     if query.chat_type not in (ChatType.PRIVATE, ChatType.SENDER):
         await query.answer(
             results=[],
@@ -27,7 +28,7 @@ async def answer(bot, query):
         )
         return
         
-    # Bug Fix 1: Agar query khali hai toh yahin se return karein (No Server Load)
+    # Bug Fix 1: Zero Query Guard (Prevents database load)
     if not query.query.strip():
         await query.answer(
             results=[],
@@ -37,7 +38,7 @@ async def answer(bot, query):
         )
         return
 
-    # Text aur file_type extract karna
+    # Extract clean query and optional file type divider
     if '|' in query.query:
         text, file_type = query.query.split('|', maxsplit=1)
         text = text.strip()
@@ -48,7 +49,7 @@ async def answer(bot, query):
 
     offset = int(query.offset or 0)
     
-    # Search results fetch karna
+    # Asynchronous Database Fetch Context
     try:
         files, next_offset, total = await get_search_results(
             chat_id=None, 
@@ -71,7 +72,8 @@ async def answer(bot, query):
         file_size = getattr(file, "file_size", file.get('file_size') if isinstance(file, dict) else 0)
         file_type_str = getattr(file, "file_type", file.get('file_type') if isinstance(file, dict) else 'Unknown')
 
-        pm_link = f"https://t.me/{bot_username}?start=file_{user_id}_{file_id}"
+        # FIX: Appended 'inline' keyword to match the 3 underscores splitting pattern inside start.py
+        pm_link = f"https://t.me/{bot_username}?start=notcopy_{user_id}_inline_{file_id}"
         
         reply_markup = InlineKeyboardMarkup([
             [InlineKeyboardButton("📥 Get File", url=pm_link)],
@@ -96,7 +98,7 @@ async def answer(bot, query):
         )
 
     if results:
-        # Bug Fix 3: Length string ko short rakhna taaki 64 chars limit cross na ho
+        # Bug Fix 3: 64 Characters Telegram Safety Guard
         switch_pm_text = f"{emoji.FILE_FOLDER} Total Results: {total}"
         if len(switch_pm_text) > 64:
             switch_pm_text = switch_pm_text[:64]
@@ -109,7 +111,6 @@ async def answer(bot, query):
             next_offset=str(next_offset) if next_offset else ""
         )
     else:
-        # Bug Fix 3: No results text limit handle karna
         switch_pm_text = f'{emoji.CROSS_MARK} No results found'
         await query.answer(
             results=[],
