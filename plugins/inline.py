@@ -1,4 +1,3 @@
-# inline.py
 import logging
 from pyrogram import Client, emoji, filters
 from pyrogram.types import (
@@ -19,17 +18,17 @@ logger = logging.getLogger(__name__)
 async def answer(bot, query):
     """Show search results for given inline query"""
     
-    # Only allow in PM
-    if query.chat_type not in (ChatType.PRIVATE, ChatType.SENDER):
+    # Bug Fix 1: Agar query khali hai toh yahin se return karein (No Server Load)
+    if not query.query.strip():
         await query.answer(
             results=[],
-            cache_time=0,
-            switch_pm_text='⚠️ Work only in PM',
-            switch_pm_parameter="help"
+            cache_time=CACHE_TIME,
+            switch_pm_text="🔍 Type anything to search files...",
+            switch_pm_parameter="start"
         )
         return
 
-    results = []
+    # Text aur file_type extract karna
     if '|' in query.query:
         text, file_type = query.query.split('|', maxsplit=1)
         text = text.strip()
@@ -40,16 +39,21 @@ async def answer(bot, query):
 
     offset = int(query.offset or 0)
     
-    # Get search results
-    files, next_offset, total = await get_search_results(
-        chat_id=None, 
-        query=text, 
-        file_type=file_type, 
-        max_results=10, 
-        offset=offset
-    )
+    # Search results fetch karna
+    try:
+        files, next_offset, total = await get_search_results(
+            chat_id=None, 
+            query=text, 
+            file_type=file_type, 
+            max_results=10, 
+            offset=offset
+        )
+    except Exception as e:
+        logger.error(f"Error in fetching search results: {e}")
+        return
 
     bot_username = getattr(temp, "U_NAME", bot.username) or bot.username
+    results = []
 
     for file in files:
         file_id = getattr(file, "file_id", file.get('file_id') if isinstance(file, dict) else '')
@@ -82,25 +86,24 @@ async def answer(bot, query):
         )
 
     if results:
-        switch_pm_text = f"{emoji.FILE_FOLDER} Results - {total}"
-        if text:
-            switch_pm_text += f" for {text}"
+        # Bug Fix 3: Length string ko short rakhna taaki 64 chars limit cross na ho
+        switch_pm_text = f"{emoji.FILE_FOLDER} Total Results: {total}"
+        if len(switch_pm_text) > 64:
+            switch_pm_text = switch_pm_text[:64]
 
         await query.answer(
             results=results,
-            cache_time=CACHE_TIME,          # ← Fixed
+            cache_time=CACHE_TIME,
             switch_pm_text=switch_pm_text,
             switch_pm_parameter="start",
             next_offset=str(next_offset) if next_offset else ""
         )
     else:
-        switch_pm_text = f'{emoji.CROSS_MARK} No results'
-        if text:
-            switch_pm_text += f' for "{text}"'
-
+        # Bug Fix 3: No results text limit handle karna
+        switch_pm_text = f'{emoji.CROSS_MARK} No results found'
         await query.answer(
             results=[],
-            cache_time=CACHE_TIME,          # ← Fixed
+            cache_time=CACHE_TIME,
             switch_pm_text=switch_pm_text,
-            switch_pm_parameter="okay",
+            switch_pm_parameter="start",
         )
