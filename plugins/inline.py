@@ -17,7 +17,16 @@ logger = logging.getLogger(__name__)
 @Client.on_inline_query()
 async def answer(bot, query):
     """Show search results for given inline query"""
-    
+
+    if query.chat_type not in (ChatType.PRIVATE, ChatType.SENDER):
+        await query.answer(
+            results=[],
+            cache_time=0,
+            switch_pm_text='⚠️ Work only in Bot PM',
+            switch_pm_parameter="help"
+        )
+        return
+        
     # Bug Fix 1: Agar query khali hai toh yahin se return karein (No Server Load)
     if not query.query.strip():
         await query.answer(
@@ -54,14 +63,15 @@ async def answer(bot, query):
 
     bot_username = getattr(temp, "U_NAME", bot.username) or bot.username
     results = []
-
+    user_id = query.from_user.id if query.from_user else 0
+    
     for file in files:
         file_id = getattr(file, "file_id", file.get('file_id') if isinstance(file, dict) else '')
         file_name = getattr(file, "file_name", file.get('file_name') if isinstance(file, dict) else 'Unknown')
         file_size = getattr(file, "file_size", file.get('file_size') if isinstance(file, dict) else 0)
         file_type_str = getattr(file, "file_type", file.get('file_type') if isinstance(file, dict) else 'Unknown')
 
-        pm_link = f"https://t.me/{bot_username}?start=file_{file_id}"
+        pm_link = f"https://t.me/{bot_username}?start=file_{user_id}_{file_id}"
         
         reply_markup = InlineKeyboardMarkup([
             [InlineKeyboardButton("📥 Get File", url=pm_link)],
